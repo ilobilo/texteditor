@@ -104,7 +104,7 @@ std::size_t intlen(auto num)
 
 auto max_digits()
 {
-    return std::max(intlen(rows.size()), std::size_t(2));
+    return std::max(intlen(rows.size()), intlen(height - 2));
 }
 
 constexpr inline std::size_t round_down(std::size_t n, std::size_t a)
@@ -127,7 +127,7 @@ std::size_t x2r(std::string_view rline, std::size_t x)
 {
     auto mdigits = max_digits();
     std::size_t ret = 0;
-    for (std::size_t i = 0; i < (x - (mdigits + 1)); i++)
+    for (std::size_t i = 0; i < std::min(rline.length(), x - (mdigits + 1)); i++)
     {
         if (rline.at(i) == '\t')
             ret += (tab_size - 1) - (ret % tab_size);
@@ -170,9 +170,9 @@ void append(char c)
         else if (!(cursor.y == rows.size() && cursor.x == rows[cursor.y - 1].first.length() + (mdigits + 1)))
         {
             auto &row = rows[cursor.y - 1];
-            auto it = rows.emplace(rows.begin() + cursor.y, std::string_view(row.first).substr(cursor.x - (mdigits + 1)), "");
+            auto it = rows.emplace(rows.begin() + cursor.y, std::string_view(row.first).substr(std::min(row.first.length(), cursor.x - (mdigits + 1))), "");
             it->second = getrline(it->first);
-            row.second = getrline(row.first.erase(cursor.x - (mdigits + 1)));
+            row.second = getrline(row.first.erase(std::min(row.first.length(), cursor.x - (mdigits + 1))));
         }
         cursor.y++;
         cursor.x = mdigits + 1;
